@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Muss's Birthday Scrapbook</title>
+    <style>
+        @font-face {
+            font-family: 'Czaristane';
+            src: url('czaristane.ttf') format('truetype');
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Czaristane', 'Comic Sans MS', cursive, sans-serif;
+            background-color: #111; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; color: #444; touch-action: none;
+        }
+
+        #bg-blur {
+            position: absolute; top: -10%; left: -10%; width: 120%; height: 120%;
+            background-size: cover; background-position: center;
+            filter: blur(8px) brightness(0.35); z-index: 0;
+            transition: background-image 1s ease;
+        }
+
+        .book-container {
+            position: relative; width: 92vw; height: 85vh; max-width: 480px;
+            perspective: 2500px; z-index: 10; cursor: grab;
+        }
+        .book-container:active { cursor: grabbing; }
+
+        .page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #fdfcf8; background-size: cover; background-position: center;
+            border-radius: 2px 12px 12px 2px;
+            box-shadow: inset 4px 0 10px rgba(0,0,0,0.1), 5px 5px 20px rgba(0,0,0,0.4);
+            transform-origin: left center;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-style: preserve-3d; backface-visibility: hidden;
+            overflow: hidden; padding: 25px 20px 25px 40px;
+        }
+
+        .page::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 90%, rgba(0,0,0,0.4) 100%);
+            opacity: 0; transition: opacity 1s; pointer-events: none; z-index: 50;
+        }
+        .page.flipped { transform: rotateY(-180deg); pointer-events: none; }
+        .page.flipped::after { opacity: 1; } 
+
+        /* COVER BUKU */
+        .page.cover {
+            background-color: #8fa8c8; 
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.5) 0%, rgba(255,255,255,0.2) 3%, rgba(0,0,0,0.1) 6%, transparent 10%),
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+            padding: 0; align-items: center; justify-content: center; display: flex; flex-direction: column;
+            box-shadow: inset 8px 0 15px rgba(0,0,0,0.3), inset -2px 0 5px rgba(0,0,0,0.1), 8px 10px 25px rgba(0,0,0,0.5);
+            border-left: 2px solid #5a7396;
+        }
+
+        .cover-content { position: relative; z-index: 10; text-align: center; margin-top: -30px; }
+        .cover-title { font-size: 24px; letter-spacing: 2px; color: #2c3540; font-weight: bold; text-shadow: 1px 1px 0px rgba(255,255,255,0.4); margin-bottom: 5px;}
+
+     /* FONT SIZE DINAIKIN & DIBIKIN SEMI-BOLD SOFT */
+     .handwriting {
+            font-size: 13.5px; /* Naik 3px biar lega dibaca */
+            font-weight: 600; /* Bikin agak tebal tapi nggak ngeblok */
+            color: #383838; /* Warna hitam soft biar nggak nabrak estetika */
+            line-height: 1.6;
+            text-align: justify; 
+            position: relative; 
+            z-index: 2;
+            min-height: 80px; 
+        }
+        .cursor { 
+            display: inline-block; 
+            width: 2px; 
+            height: 15px; /* Sesuaikan tingginya sama font yang baru */
+            background-color: #383838; /* Samain warnanya sama font */
+            animation: blink 0.7s infinite; 
+            vertical-align: middle; 
+            margin-left: 2px; 
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* KICAUMANIA GIF DI BELAKANG TEKS (Z-INDEX 1) */
+        .kicau-gif {
+            position: absolute; z-index: 1; opacity: 0.8; pointer-events: none;
+        }
+        /* Penempatan 3 GIF sesuai kotak merah lu */
+        .gif-1 { top: 48%; right: 15%; width: 65px; } /* Kotak tengah kanan */
+        .gif-2 { top: 60%; left: 10%; width: 80px; } /* Kotak tengah kiri */
+        .gif-3 { bottom: 12%; right: 12%; width: 100px; } /* Kotak bawah kanan */
+
+        /* POLAROID & COLLAGE */
+        .photo-wrapper { position: relative; z-index: 2; margin-bottom: 15px; display: flex; justify-content: center; }
+        .polaroid { background: #fff; padding: 6px 6px 20px 6px; box-shadow: 2px 4px 10px rgba(0,0,0,0.15); border-radius: 2px; position: relative; width: 85%; z-index: 5;}
+        .polaroid img { width: 100%; height: 160px; object-fit: cover; display: block; }
+        
+        .collage { position: relative; height: 260px; margin-top: 10px; margin-bottom: 25px; z-index: 5;}
+        .collage .polaroid { position: absolute; width: 120px; }
+        .collage .polaroid img { height: 120px; }
+        .col-1 { top: 0; left: 0; transform: rotate(-6deg); z-index: 1; }
+        .col-2 { top: 40px; right: 5px; transform: rotate(8deg); z-index: 2; }
+        .col-3 { top: 120px; left: 30px; transform: rotate(-3deg); z-index: 3; }
+
+        .tape { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-3deg); width: 60px; height: 20px; background: rgba(255,255,255,0.6); box-shadow: 0 1px 3px rgba(0,0,0,0.1); backdrop-filter: blur(2px); z-index: 5; }
+        .paperclip { position: absolute; top: -12px; left: 20%; width: 12px; height: 35px; border: 2px solid #a0a0a0; border-radius: 10px; border-bottom: none; transform: rotate(15deg); z-index: 5; box-shadow: 2px 0px 2px rgba(0,0,0,0.1); }
+        .paperclip::after { content: ''; position: absolute; bottom: 0; right: -2px; width: 6px; height: 20px; border: 2px solid #a0a0a0; border-top: none; border-radius: 0 0 5px 5px; }
+
+        /* SPOTIFY WIDGET */
+        .spotify-widget { position: relative; width: 95%; margin: 20px auto; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 3px solid #fff; z-index: 2;}
+        .spotify-widget video { width: 100%; height: 250px; object-fit: cover; display: block; filter: brightness(0.7); pointer-events: none;}
+        .spot-ui { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.9) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 15px; color: white; font-family: sans-serif; pointer-events: none;}
+        .spot-title { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+        .spot-artist { font-size: 12px; color: #b3b3b3; margin-bottom: 10px; }
+        .spot-lyric-box { background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; border-left: 3px solid #1DB954; margin-bottom: 10px; transition: 0.3s ease;}
+        .spot-lyric-text { font-size: 13px; font-weight: bold; color: #1DB954; transition: 0.2s; }
+
+        /* TANDA TANGAN (TTD) */
+        .signature { 
+            position: absolute; bottom: 30px; left: 30px; z-index: 2; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 1s ease-in; pointer-events: none;
+        }
+        .signature.show { opacity: 1; pointer-events: auto; }
+        .signature img { width: 100px; opacity: 0.8; }
+
+        .hint { position: absolute; bottom: 20px; font-size: 12px; color: #555; width: 100%; text-align: center; animation: pulse 2s infinite; pointer-events: none;}
+        
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 0.8; } 100% { opacity: 0.3; } }
+
+        /* ANIMASI LABEL MUSS TURNING 19 */
+        .highlight-label {
+            display: inline-block;
+            background-color: rgba(253, 252, 248, 0.9);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #383838;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            border: 1px solid #e0e0e0;
+            letter-spacing: 0.5px;
+            /* Efek animasi pop dan float berulang */
+            animation: pop-bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes pop-bounce {
+            0%, 100% { 
+                transform: translateY(0) scale(1); 
+                box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            }
+            50% { 
+                transform: translateY(-4px) scale(1.08); 
+                box-shadow: 0 8px 15px rgba(29, 185, 84, 0.2); /* Sedikit hint warna hijau spotify di shadow-nya */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-blur"></div>
+
+    <div class="book-container" id="book">
+        
+        <!-- PAGE 0: COVER -->
+        <div class="page cover" id="page-0" data-bg="bg-1.jpg">
+            <div class="cover-content">
+                <div class="cover-title">muss's birthday</div>
+                <div style="font-size: 12px; color: #444; letter-spacing: 1px;">A beautiful journey</div>
+            </div>
+            <div class="hint">Geser (Swipe) untuk membuka</div>
+        </div>
+
+        <!-- PAGE 1: MEMORIES -->
+        <div class="page" id="page-1" style="background-image: url('bg-1.jpg');" data-bg="bg-1.jpg">
+            <div style="text-align: center; margin-top: 30%;">
+                <div class="cover-title" style="font-size: 22px;">muss's birthday</div>
+                <div style="font-size: 13px; margin-top:5px; color:#555;">Memories and milestones of our<br>beautiful journey.</div>
+            </div>
+            <!-- COPYRIGHT DIPINDAH KE BAWAH -->
+            <div style="position: absolute; bottom: 120px; width: 100%; left: 0; text-align: center;">
+                <div style="display:inline-flex; flex-direction: column; align-items: center; gap: 0px;">
+                    <div style="background: #a0b6d6; color: white; padding: 4px 8px; border-radius: 4px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    </div>
+                    <div style="font-size: 11px; color: #777;">special for u<br>made by almeira</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: COLLAGE AIB & 3 KICAUMANIA -->
+        <div class="page" id="page-2" style="background-image: url('bg-2.jpg');" data-bg="bg-2.jpg">
+            <div class="collage">
+                <div class="polaroid col-1"><img src="foto1.jpeg" alt="Aib"><div class="tape"></div></div>
+                <div class="polaroid col-2"><img src="foto2.jpeg" alt="Aib"><div class="paperclip"></div></div>
+                <div class="polaroid col-3"><img src="foto3.jpeg" alt="Aib"><div class="tape" style="background: rgba(255, 182, 193, 0.6);"></div></div>
+            </div>
+            
+            <!-- 3 GIF Lucu Di Belakang Teks (Z-Index 1) -->
+            <img src="kicaumania.gif" class="kicau-gif gif-1" alt="Kicau">
+            <img src="kicaumania.gif" class="kicau-gif gif-2" alt="Kicau">
+            <img src="kicaumania.gif" class="kicau-gif gif-3" alt="Kicau">
+
+            <!-- Teks di Z-Index 2 biar GIF ada di belakangnya -->
+            <div class="handwriting type-target" data-text="Thank you for always being there, lengkap dengan segala tingkah random kamu yang kadang bikin geleng-geleng kepala. Tapi liat muka-muka komuk ini justru bikin aku sadar... no matter how annoying you get, ujung-ujungnya tetep aja bikin aku makin sayang. I guess I just really love every little detail about you, even the silly ones."></div>
+        </div>
+
+   <!-- PAGE 3: SPOTIFY WIDGET LIRIK -->
+   <div class="page" id="page-3" style="background-image: url('bg-3.jpg');" data-bg="bg-3.jpg">
+    <div class="handwriting type-target" data-text="But jokes aside, look at this..." style="min-height: 30px;"></div>
+    
+    <div class="spotify-widget">
+        <video id="main-video" src="main.mp4" muted loop playsinline></video>
+        <div class="spot-ui">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <div>
+                    <div class="spot-title">Wish List</div>
+                    <div class="spot-artist">Taylor Swift</div>
+                </div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            </div>
+            <div class="spot-lyric-box">
+                <div class="spot-lyric-text" id="spotify-lyric">"..."</div>
+            </div>
+            <div style="width: 100%; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px;">
+                <div id="spot-progress-fill" style="width: 0%; height: 100%; background: white; border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+<!-- LABEL MUSS TURNING 19! -->
+<div style="text-align: center; margin-top: 15px; position: relative; z-index: 2;">
+    <span class="highlight-label">
+        muss turning 19!
+    </span>
+</div>
+</div>
+
+        <!-- PAGE 4: DUAL SWEET PHOTOS -->
+        <div class="page" id="page-4" style="background-image: url('bg-4.jpg');" data-bg="bg-4.jpg">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <div class="polaroid" style="transform: rotate(-2deg); margin: 0 auto;">
+                    <div class="tape"></div>
+                    <img src="fotos1.jpeg" alt="Sweet 1">
+                    <div class="handwriting type-target" data-text="To the one who holds my heart." style="text-align: center; margin-top: 5px; min-height: 25px;"></div>
+                </div>
+                <div class="polaroid" style="transform: rotate(1.5deg); margin: 0 auto;">
+                    <div class="paperclip"></div>
+                    <img src="fotos2.jpeg" alt="Sweet 2">
+                    <div class="handwriting type-target" data-text="You make everything better." style="text-align: center; margin-top: 5px; min-height: 25px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 5: FINAL WISH & TTD -->
+        <div class="page" id="page-5" style="background-image: url('bg-5.jpg');" data-bg="bg-5.jpg">
+            <div style="height: 100%; overflow-y: auto; scrollbar-width: none;">
+                <div class="photo-wrapper">
+                    <div class="polaroid" style="transform: rotate(2deg);">
+                        <div class="tape" style="background: rgba(255, 182, 193, 0.6);"></div>
+                        <img src="fotos3.jpeg" alt="Final">
+                    </div>
+                </div>
+                <div class="handwriting type-target" data-text="muss, happy birthday yaa.  Thank you for always taking such good care of me—picking me up, taking me to new places, and just being such a fun and lovely person to be around. semoga kamu selalu baik dan akan jadi lebih baik lagi kedepan nyaa, aku selalu berdoa buat kamuu semoga segala hal dalam hidup kamu selalu di permudah. i love you to the moon and back"></div>
+            </div>
+            
+            <!-- TANDA TANGAN (Kiri Bawah, Hidden di Awal) -->
+            <div class="signature" id="final-signature">
+                <img src="ttd.png" alt="ttd" onerror="this.style.display='none'">
+                <!-- Kalau lu mau nambahin teks di bawah ttd, posisinya bakal otomatis justify-center di sini -->
+            </div>
+        </div>
+
+    </div>
+
+    <audio id="audio-kicau" src="kicaumania.mp3" loop></audio>
+    <audio id="audio-taylor" src="wishlist.mp3" loop></audio>
+
+    <script>
+        const pages = document.querySelectorAll('.page');
+        const bgBlur = document.getElementById('bg-blur');
+        const audioKicau = document.getElementById('audio-kicau');
+        const audioTaylor = document.getElementById('audio-taylor');
+        const mainVideo = document.getElementById('main-video');
+        const book = document.getElementById('book');
+
+        let currentPage = 0;
+        let totalPages = pages.length;
+        let isAudioUnlocked = false;
+        let isFlipping = false;
+        let typeTimeouts = []; 
+
+        pages.forEach((page, index) => { page.style.zIndex = totalPages - index; });
+
+        function unlockAudioEngine() {
+            if (!isAudioUnlocked) {
+                audioKicau.play().then(() => audioKicau.pause()).catch(e => {});
+                audioTaylor.play().then(() => audioTaylor.pause()).catch(e => {});
+                isAudioUnlocked = true;
+            }
+        }
+
+        function playFlipSound() {
+            let flipSound = new Audio('shhh.mp3');
+            flipSound.play().catch(e => {});
+        }
+
+        // ==========================================
+        // SISTEM DRAG / SWIPE HALAMAN (3D INTERAKTIF)
+        // ==========================================
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        function dragStart(e) {
+            if (isFlipping) return;
+            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            isDragging = true;
+            unlockAudioEngine();
+        }
+
+        function dragMove(e) {
+            if (!isDragging || isFlipping) return;
+            currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            let diff = currentX - startX;
+
+            let activePage = document.getElementById(`page-${currentPage}`);
+            if (activePage) activePage.style.transition = 'none';
+
+            if (diff < 0 && currentPage < totalPages - 1) { 
+                let rot = Math.max(diff / 4, -30); 
+                if (activePage) activePage.style.transform = `rotateY(${rot}deg)`;
+            } else if (diff > 0 && currentPage > 0) { 
+                let prevPage = document.getElementById(`page-${currentPage - 1}`);
+                if (prevPage) {
+                    prevPage.style.transition = 'none';
+                    let rot = Math.min(-180 + (diff / 4), -150);
+                    prevPage.style.transform = `rotateY(${rot}deg)`;
+                }
+            }
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            let diff = currentX - startX;
+
+            let activePage = document.getElementById(`page-${currentPage}`);
+            if (activePage) {
+                activePage.style.transition = 'transform 1s cubic-bezier(0.645, 0.045, 0.355, 1)';
+                activePage.style.transform = ''; 
+            }
+            if (currentPage > 0) {
+                let prevPage = document.getElementById(`page-${currentPage - 1}`);
+                if (prevPage) {
+                    prevPage.style.transition = 'transform 1s cubic-bezier(0.645, 0.045, 0.355, 1)';
+                    prevPage.style.transform = 'rotateY(-180deg)';
+                }
+            }
+
+            if (Math.abs(diff) > 50) {
+                if (diff < 0) nextPage();
+                else prevPage();
+            } else if (Math.abs(diff) < 10) {
+                const rect = book.getBoundingClientRect();
+                if (currentX > rect.left + rect.width / 2) nextPage();
+                else prevPage();
+            }
+        }
+
+        book.addEventListener('touchstart', dragStart, {passive: true});
+        book.addEventListener('touchmove', dragMove, {passive: true});
+        book.addEventListener('touchend', dragEnd);
+        book.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+
+        // ==========================================
+        // ANIMASI NGETIK & LOGIKA AUDIO
+        // ==========================================
+        function startTypewriter(pageIndex) {
+            typeTimeouts.forEach(t => clearTimeout(t));
+            typeTimeouts = [];
+
+            // Reset TTD jika pindah halaman
+            const sig = document.getElementById('final-signature');
+            if (sig) sig.classList.remove('show');
+
+            const activePage = document.getElementById(`page-${pageIndex}`);
+            const targets = activePage.querySelectorAll('.type-target');
+            
+            targets.forEach(target => {
+                const text = target.getAttribute('data-text');
+                target.innerHTML = ''; 
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        target.innerHTML = text.substring(0, i + 1) + '<span class="cursor"></span>';
+                        i++;
+                        typeTimeouts.push(setTimeout(type, 35)); 
+                    } else {
+                        target.innerHTML = text; 
+                        // Tampilkan TTD tepat saat ngetik di halaman terakhir beres
+                        if (pageIndex === 5 && sig) {
+                            sig.classList.add('show');
+                        }
+                    }
+                }
+                typeTimeouts.push(setTimeout(type, 600)); 
+            });
+        }
+
+        function updateState(pageIndex) {
+            const activePage = document.getElementById(`page-${pageIndex}`);
+            const bgSource = activePage.getAttribute('data-bg');
+            
+            if (bgSource) {
+                bgBlur.style.backgroundImage = `url('${bgSource}')`;
+                bgBlur.style.opacity = 1;
+            }
+
+            if (pageIndex === 0 || pageIndex === 1) {
+                audioKicau.pause(); audioTaylor.pause(); mainVideo.pause();
+            } 
+            else if (pageIndex === 2) { 
+                audioTaylor.pause(); mainVideo.pause();
+                if (isAudioUnlocked) audioKicau.play().catch(e=>{});
+            } 
+            else if (pageIndex >= 3) { 
+                audioKicau.pause();
+                if (isAudioUnlocked) audioTaylor.play().catch(e=>{});
+                
+                if (pageIndex === 3) { mainVideo.play().catch(e=>{}); } 
+                else { mainVideo.pause(); }
+            }
+
+            startTypewriter(pageIndex);
+        }
+
+        function nextPage() {
+            if (isFlipping || currentPage >= totalPages - 1) return;
+            isFlipping = true; playFlipSound();
+            const pageToFlip = document.getElementById(`page-${currentPage}`);
+            pageToFlip.classList.add('flipped');
+            currentPage++; updateState(currentPage);
+            setTimeout(() => { isFlipping = false; }, 1000); 
+        }
+
+        function prevPage() {
+            if (isFlipping || currentPage <= 0) return;
+            isFlipping = true; playFlipSound();
+            currentPage--;
+            const pageToUnflip = document.getElementById(`page-${currentPage}`);
+            pageToUnflip.classList.remove('flipped');
+            updateState(currentPage);
+            setTimeout(() => { isFlipping = false; }, 1000);
+        }
+
+        // ==========================================
+        // JSON LIRIK SPOTIFY (LOGIKA DI UPDATE)
+        // ==========================================
+        const lyricsData = [
+            {"time": 7.03, "text": "They want that"},
+            {"time": 9.39, "text": "Yacht life under chopper blades"},
+            {"time": 10.22, "text": "They want those"},
+            {"time": 12.54, "text": "Bright lights and Balenci' shades"},
+            {"time": 15.9, "text": "And a fat ass with a baby face"},
+            {"time": 19.29, "text": "They want it all"},
+            {"time": 22.31, "text": "They want that complex female character"},
+            {"time": 25.58, "text": "They want that critical smash Palme d'Or"},
+            {"time": 28.8, "text": "And an Oscar on their bathroom floor"},
+            {"time": 32.19, "text": "They want it all"},
+            {"time": 33.89, "text": "And they should have what they want"},
+            {"time": 35.56, "text": "They deserve what they want"},
+            {"time": 38.57, "text": "Hope they get what they want"},
+            {"time": 42.34, "text": "I just want you, uh"},
+            {"time": 48.23, "text": "Have a couple kids, got the whole block lookin' like you"},
+            {"time": 51.79, "text": "We tell the world to leave us the fuck alone"},
+            {"time": 55.11, "text": "And they do, wow"},
+            {"time": 61.01, "text": "Got me dreamin' 'bout a driveway with a basketball hoop"},
+            {"time": 64.44, "text": "Boss up, settle down, got a wish (wish) list (list)"},
+            {"time": 66.49, "text": "I just want you"},
+            {"time": 69.24, "text": "They want that freedom, livin' off the grid"},
+            {"time": 72.66, "text": "They want those three dogs that they call their kids"},
+            {"time": 75.8, "text": "And that good surf, no hypocrites"},
+            {"time": 79.15, "text": "They want it all"},
+            {"time": 82.25, "text": "They want a contract with Real Madrid"},
+            {"time": 85.49, "text": "They want that spring break that was fucking lit"},
+            {"time": 88.76, "text": "And then that video taken off the internet"},
+            {"time": 92.23, "text": "They want it all"},
+            {"time": 93.99, "text": "And they should have what they want"},
+            {"time": 95.61, "text": "They deserve what they want"},
+            {"time": 98.72, "text": "I hope they get what they want"},
+            {"time": 101.47, "text": "I just want you, uh (you, you, yeah)"},
+            {"time": 108.18, "text": "Have a couple kids, got the whole block lookin' like you"},
+            {"time": 111.29, "text": "We tell the world to leave us the fuck alone"},
+            {"time": 115.32, "text": "And they do, wow"},
+            {"time": 121.12, "text": "Got me dreamin' 'bout a driveway with a basketball hoop (hoop)"},
+            {"time": 124.43, "text": "Boss up, settle down, got a wish (wish) list (list)"},
+            {"time": 129.57, "text": "I made wishes on all of the stars"},
+            {"time": 135.48, "text": "Please, God, bring me a best friend who I think is hot"},
+            {"time": 142.02, "text": "I thought I had it right, once, twice (I did not)"},
+            {"time": 144.69, "text": "But I did not, you caught me off my guard"},
+            {"time": 147.17, "text": "I hope I get what I want (get what)"},
+            {"time": 152.55, "text": "'Cause I know what I want (I just, I just)"},
+            {"time": 155.84, "text": "I just want you, uh (baby)"},
+            {"time": 160.52, "text": "Have a couple kids, got the whole block lookin' like you (got 'em lookin' like you)"},
+            {"time": 165.22, "text": "We tell the world to leave us the fuck alone"},
+            {"time": 168.6, "text": "And they do, wow"},
+            {"time": 174.61, "text": "Got me dreamin' 'bout a driveway with a basketball hoop"},
+            {"time": 177.84, "text": "Boss up, settle down, got a wish (wish) list (list)"},
+            {"time": 181.6, "text": "I just want you"},
+            {"time": 182.86, "text": "Ooh (and we could)"},
+            {"time": 184.48, "text": "Have a couple kids, got the whole block lookin' like you (you)"},
+            {"time": 186.09, "text": "We tell the world to leave us the fuck alone"},
+            {"time": 194.98, "text": "And they do (yeah), wow (and now you)"},
+            {"time": 200.46, "text": "Got me dreamin' 'bout a driveway with a basketball hoop"},
+            {"time": 203.86, "text": "Boss up, settle down, got a wish (wish) list (list)"}
+        ];
+
+        audioTaylor.addEventListener('timeupdate', () => {
+            const currentTime = audioTaylor.currentTime;
+            
+            // Logika disamakan persis dengan kode Spotify (time = waktu berhenti)
+            let activeIndex = 0; 
+            for(let i=0; i<lyricsData.length; i++) {
+                if(currentTime >= lyricsData[i].time) {
+                    activeIndex = i + 1;
+                } else { 
+                    break; 
+                }
+            }
+            if(activeIndex >= lyricsData.length) activeIndex = lyricsData.length - 1;
+            
+            document.getElementById('spotify-lyric').innerText = `"${lyricsData[activeIndex].text}"`;
+            
+            if(audioTaylor.duration) {
+                const progress = (currentTime / audioTaylor.duration) * 100;
+                document.getElementById('spot-progress-fill').style.width = progress + '%';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => { updateState(0); });
+    </script>
+</body>
+</html>

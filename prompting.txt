@@ -1,0 +1,45 @@
+Hallo bro jadi gw pengen bikin aplikasi ultah ke pacar gw (ana), temanya adalah jack scrapbooks yang gw lampirin, disitu ada 4 foto tapi lu improve aja, file dari gw dikategoriin bro dengan 2 lagu sebagai backsound
+
+Lagu Kicau Mania dengan format kicaumania.mp3 yang di loop terus, tapi ketika ke halaman lagu ke 2 lagu ini mati lagu 2 yang berjalan (untuk aib) -> ini ada 3 foto dengan format jpeg dengan nama foto1.jpeg - foto3.jpeg , nuansa ini kita pake biar ada sensasi nyebelin
+
+Lagu Wish List Taylor Swift, lagu ini juga di loop (untuk foto dan video yang bener) -> ini ada 1 video sebagai main atau yang pertama di buka dihalaman dengan nama file main.mp4  dan 3 foto sisanya fotos1.jpeg - fotos3.jpeg, nuansa inii udah mulai serius dan wish yang gemes gemes
+
+
+
+Alur singkat (Gambaran gw)
+
+1. Ada cover buku halaman sama persis dengan gambar gw yang gw lampirin di urutan ke 1, baby feats diganti dengan kalimat ana's birthday
+
+2. Ketika buka halaman ada halaman gambar 2 bebas lu improve kalimat nya memories apa gitu kalo disitu kan memories and milestone ...
+
+3.  halaman sisanya setiap foto 1 halaman atau 1 frame yang ada foto dan text nya
+
+4. ketika masuk ke halaman wish list atau yang serius tampilan nya langsung video itu dan auto play ya bro buat muted aja mp4 nya karna sudah ada sound wish list taylor swift, kemudian sisa halaman nya 3 foto itu sama 1 halaman atau 1 frame yang ada foto dan text nya
+
+5. di halaman terakhir ada kalimat dari gw yaitu :
+
+"ana, happy birthday yaa.  Thank you for always taking such good care of me—picking me up, taking me to new places, and just being such a fun and lovely person to be around. semoga kamu selalu baik dan akan jadi lebih baik lagi kedepan nyaa, aku selalu berdoa buat kamuu semoga segala hal dalam hidup kamu selalu di permudah. i love you to the moon and back"
+
+
+
+tapi itu baru gambaran gw ya, kalo lu ada improve yang lebih bagus misal ada 2 foto di 1 halaman biar tampilan tiap halaman nya bervariasi boleh, pokonya buat semenarik dan sekeren mungkin bro, gw pengen ini jadi hadih masterpiece
+
+
+
+dan 1 lagi karna temanya buku gini pasti ada bagian background yang kosong, boleh di isi background foto kita aja tiap halaman misalnya random boleh lu ambil dari file jpeg itu, nah dibuat blur aja pokonya jangan jomplang juga background nya biar ga ngerubah estetika konten utamanya
+
+
+
+catatan:
+
+- kata kata yang dipake jangan terlalu romantis dan alay
+
+- buatkan dalam bentuk web statis tampilan hp menggunakan html dan js
+
+- font yang digunakan berdasarkan contoh lampiran czaristane regular
+
+- buat se animatif mungkin dan tiap halaman nya ketika slide ada suara sound mp3 nama file nya shhh.mp3, dan tiap ganti halaman ada animasi seperti menilap untuk mebuka halaman baru bro biat keliatan real nya
+
+
+
+itu aja sih request dari gw buat dalam 1 file index.html ya, kirim gw full script nya
